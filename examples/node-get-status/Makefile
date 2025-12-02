@@ -1,0 +1,21 @@
+exes := node npm
+status := $(foreach exe, $(exes), $(if $(shell which $(exe)), "Found $(exe)\n", $(error "No $(exe) in Path") ))
+
+package := $(wildcard package*.json)
+
+default: run
+
+.PHONY: build
+build:
+	@node --version
+	@npm --version	
+	@echo $(package)
+
+node_modules: $(package)
+	@echo installing deps
+	npm ci
+
+.PHONY: run
+run: node_modules
+	@echo running script
+	@npm run getstatus
