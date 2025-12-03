@@ -1,0 +1,73 @@
+statedb := 'state.db'
+
+createstate:
+    #!/usr/bin/env nu
+
+    use 'std/log'
+
+    log info "Loading up some state"
+    let now = (date now)
+    { date: $now } | into sqlite -t dates {{ statedb }}
+    log info "Loaded up some state"
+
+
+readstate:
+    #!/usr/bin/env nu
+
+    use 'std/log'
+
+    log info "Reading some state"
+    open {{ statedb }} | query db "SELECT * FROM dates;"
+
+
+indepth:
+    #!/usr/bin/env nu
+
+    use 'std/log'
+
+    log info "Adding another table and data"
+
+    let db = ( open {{ statedb }} )
+    $db | query db "CREATE TABLE IF NOT EXISTS test (one TEXT, two TEXT);"
+    $db | query db "INSERT INTO test (one, two) VALUES ('first', 'second');"
+    $db | query db "SELECT * FROM test;"
+
+
+# Get a Random Word
+getaword:
+    #!/usr/bin/env nu
+
+    use 'std/log'
+
+    log info "Getting a random word"
+    let words = (open /usr/share/dict/words )
+    let wordlength = ($words | lines | length)
+    let randnum = (random int 0..$wordlength)
+    let magicword = ( $words | lines | slice $randnum..$randnum | first )
+    print $magicword
+    ^just storeword $magicword
+
+
+storeword word:
+    #!/usr/bin/env nu
+
+    use 'std/log'
+
+    const MAGIC_WORD = "{{ word }}"
+    const STATE_DB = "{{ statedb }}"
+    log info $"Storing our magic word: ($MAGIC_WORD)"
+    echo {word: $MAGIC_WORD} | into sqlite -t magicwords $STATE_DB
+    log info "Saved our magic word"
+
+dumpmagicwords:
+    #!/usr/bin/env nu
+
+    use 'std/log'
+
+    const STATE_DB = "{{ statedb }}"
+
+    log info "Dumping Magic Word Database"
+    open $STATE_DB | query db "SELECT * FROM magicwords;"
+
+
+
