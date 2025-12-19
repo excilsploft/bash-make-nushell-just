@@ -1,7 +1,9 @@
+set unstable
 node := require("node")
 python := require("python")
 curl := require("curl")
 jq := require("jq")
+nu := which("nu")
 
 # Get All Statuses in Parallel
 [parallel]
@@ -53,7 +55,7 @@ run-python:
         print(f"Python {e}")
 
 # Get the Github Status via cURL/jq
-run-bash:
+run-bash: 
     #!/usr/bin/env bash
 
     echo "Getting status from https://www.githubstatus.com/api/v2/summary.json via cURL"
@@ -63,5 +65,34 @@ run-bash:
         echo "Bash Error Getting Github Status"
     fi
     echo "$STATUS" | jq -r '"Github Status: \(.status.description)"'
+
+
+# Get the Slack Status via NuShell
+run-nu:
+    #!/usr/bin/bash
+
+    if [[ "{{ nu }}" == "" ]]
+    then
+        echo "No NuShell found in your path, this recipe requires it!"
+        echo "Install it from here: https://www.nushell.sh/book/installation.html "
+        exit 1
+    else 
+        just private-run-nu
+    fi
+
+# Get the Slack Status via NuShell but only with a guard recipe
+[private]
+private-run-nu:
+    #!{{ nu }}
+
+    const SLACK_STATUS_API = "https://slack-status.com/api/v2.0.0/current"
+        print $"Getting Status from ($SLACK_STATUS_API) via NuShell"
+    try {
+        let slack_status = (http get $SLACK_STATUS_API | get status)
+        print $"Slack Status: ($slack_status)"
+    } catch { |err|
+
+        print $"NuShell error ($err)"
+    }
 
 
