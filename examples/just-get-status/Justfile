@@ -1,0 +1,43 @@
+
+gh-status-url := "https://www.githubstatus.com/api/v2/summary.json"
+npm-status-url := "https://status.npmjs.org/api/v2/summary.json"
+
+pypi-status-url := "https://status.python.org/api/v2/summary.json"
+
+# Get all The statuses
+[parallel]
+get-all: get-github-status get-npm-status get-pypi-status
+
+# Get Github Status from the Github Status API
+get-github-status: (get-status "GitHub" gh-status-url)
+
+# Get NPM Status from the NPM Status API
+get-npm-status: (get-status "NPM" npm-status-url)
+
+# Get PyPi Status from the PyPi Infrastructure Status API
+get-pypi-status: (get-status "PyPi" pypi-status-url)
+
+# Private parameterized recipe for getting status page data
+[private]
+get-status site="GitHub" url=gh-status-url:
+    #!/usr/bin/env nu
+
+    use "std/log"
+
+    const SITE = "{{ site }}"
+    const SITE_URL = "{{ url }}"
+
+    log info $"Getting Status from ($SITE)"
+    try {
+        let status = (http get $SITE_URL | get status)
+        let msg = $"($SITE): ($status.description)"
+        match $status.indicator {
+            "critical" => { log error $"($msg)" }
+            "major" => { log critical $"($msg)" }
+            "minor" => { log critical $"($msg)" }
+            _ => { log info $"($msg)" }
+        }
+
+    } catch {|e|
+        log error $"Error: Getting Status from ($SITE): ($e)"
+    }

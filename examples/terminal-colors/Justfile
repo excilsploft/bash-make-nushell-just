@@ -1,0 +1,27 @@
+print:
+    @printf "\033[39m"
+    @printf "\033[48;5;15m"
+    @printf "\033[38;5;206;48;5;15mpink\n"
+    @printf "\033[38;5;19;48;5;15mblue\n"
+    @printf "\033[39;49m"
+    @printf "\033[49m"
+
+
+colortime:
+    #!/usr/bin/env nu
+
+    const COLOR_TABLE = [[color code]; [blue 4] [pink, 13] [ red 1 ] [yellow 11] [green 2]]
+
+    print -n (ansi reset)
+    print -n (ansi  --escape "48,5,15m")
+    mut x = 0
+
+    while $x < 100 {
+        let rand_num = ( random int 0..($COLOR_TABLE | drop 1 | length))
+        let color_code = ($COLOR_TABLE | select $rand_num)
+        let code = $"38;5;($color_code | get code | first);48;5;15m"
+        let color = ($color_code | get color | first)
+        print -n $"(ansi --escape ($code))($color) "
+        $x = $x + 1
+    }
+    print (ansi reset)

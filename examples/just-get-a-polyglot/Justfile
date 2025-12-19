@@ -1,0 +1,67 @@
+node := require("node")
+python := require("python")
+curl := require("curl")
+jq := require("jq")
+
+# Get All Statuses in Parallel
+[parallel]
+all-at-once: run-node run-python run-bash
+
+# Get All Statuses serially
+all: run-node run-python run-bash
+
+# Get the Github Status via Node.js
+run-node:
+    #!/usr/bin/env node
+
+    async function getStatus() {
+      const url = "https://status.npmjs.org/api/v2/summary.json"
+      console.log(`Getting Status from ${url} via Node.js`);
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log(`NPM Status: ${result.status.description}`);
+      } catch (error) {
+        console.error(`Node Error ${error.message}`);
+      }
+    }
+
+    getStatus();
+
+# Get the PyPi Status via Python
+run-python:
+    #!/usr/bin/env python
+    import urllib.request
+    import json
+
+    url = "https://status.python.org/api/v2/summary.json"
+    print(f"Getting Status from {url} via Python")
+    req = urllib.request.Request(url)
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = resp.read()
+
+        decoded = json.loads(data)
+
+        print(f"PyPi Status: {decoded['status']['description']}")
+
+    except Exception as e :
+        print(f"Python {e}")
+
+# Get the Github Status via cURL/jq
+run-bash:
+    #!/usr/bin/env bash
+
+    echo "Getting status from https://www.githubstatus.com/api/v2/summary.json via cURL"
+    STATUS=$(curl -skL "https://www.githubstatus.com/api/v2/summary.json")
+    if [[ $? -ne 0 ]]
+    then
+        echo "Bash Error Getting Github Status"
+    fi
+    echo "$STATUS" | jq -r '"Github Status: \(.status.description)"'
+
+

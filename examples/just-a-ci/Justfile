@@ -1,0 +1,90 @@
+workspace := source_directory() + "/workspace/"
+git-repo := "git@github.com:excilsploft/get-service-status.git"
+git-branch := "main"
+
+docker-random-string := choose('16', HEX)
+docker-image := "golang:1.26rc1-trixie"
+
+# Setup the process (make directories and clone)
+setup:
+    test -d {{ workspace }} && rm -rf {{ workspace }} || mkdir -p {{ workspace }}
+    git clone --single-branch --depth 1 --sparse -b {{ git-branch }} {{ git-repo }} {{ workspace }}
+    just build
+
+# Start the controller process
+start:
+    #!/usr/bin/env nu
+
+    use std/log
+    use std/dirs
+
+    const WORK_SPACE = "{{ workspace }}"
+    const GIT_BRANCH = "{{ git-branch }}"
+
+    log info "Start: Creating in-memory db"
+    stor create --table-name commits --columns {head: str}
+    log info $"Start: Changing into ($WORK_SPACE)"
+    dirs add $WORK_SPACE
+    let current_commit  = (^git rev-parse HEAD | lines | first)
+    log info $"Start: Storing current HEAD ($current_commit)"
+    {head: $current_commit } | stor insert --table-name commits
+    let db = stor open
+
+    log info "Start: Starting control loop"
+    while true {
+        log info "Start: Checking if we have any git updates"
+        let commit_status = (^git ls-remote --heads --quiet | lines | split column -r '\s+' | where $it.column2 =~ $"refs/heads/($GIT_BRANCH)")
+        let previous_commit = ($db | query db "SELECT head FROM commits")
+        print $"previous: ($previous_commit.head)\ncommit: ($commit_status.column1)"
+        if (($previous_commit.head | first) != ($commit_status.column1 | first)) {
+            try {
+                ^git clean -ffdx
+                ^git pull
+           } catch {|err|
+               log error "Error pulling new commit"
+               break
+           }
+           just build
+        }
+       sleep 10min
+    }
+
+# run the build command
+build:
+    #!/usr/bin/env nu
+
+    use std/log
+
+    const DOCKER_NAME = "{{ docker-random-string }}"
+    const DOCKER_IMAGE = "{{ docker-image }}"
+
+    log info "Build: Starting build container"
+
+    let container_pid = (^docker container create --name $DOCKER_NAME -v $"(pwd)/workspace:/workspace" --workdir /workspace --entrypoint="tail" $DOCKER_IMAGE "-f" "/dev/null" )
+    log info "Build: Starting docker container ($container_pid)"
+
+    try {
+        ^docker start $container_pid
+    } catch {|err|
+        log error $"Build: Error Starting Container: ($err)"
+        ^docker rm --force $container_pid
+        exit 1
+    }
+
+    let docker_container_status = (^docker ps --all --filter $"id=($container_pid)" --filter status=running --no-trunc --format "{{{{.ID}} {{{{.Status}}" )
+    log info $"Build: Checking docker container ($container_pid) is running ($docker_container_status)"
+    log info "Build: Attempting to build"
+    try {
+        ^docker container exec $container_pid sh -c "make build"
+    } catch {|err|
+        log error $"Build: Error ($err)"
+        ^docker rm --force $container_pid
+        exit 1
+    }
+
+    log info "Build: Done building"
+    ^docker rm --force $container_pid
+
+# Delete the Workspace
+clean:
+    @rm -rf {{ workspace }}

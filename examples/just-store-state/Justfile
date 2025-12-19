@@ -40,7 +40,7 @@ getaword:
     use 'std/log'
 
     log info "Getting a random word"
-    let words = (open /usr/share/dict/words )
+    let words = (open /usr/share/dict/words | str downcase)
     let wordlength = ($words | lines | length)
     let randnum = (random int 0..$wordlength)
     let magicword = ( $words | lines | slice $randnum..$randnum | first )
