@@ -12,7 +12,7 @@ all-at-once: run-node run-python run-bash
 # Get All Statuses serially
 all: run-node run-python run-bash
 
-# Get the Github Status via Node.js
+# Get the NPM Status via Node.js
 run-node:
     #!/usr/bin/env node
 
@@ -86,7 +86,7 @@ private-run-nu:
     #!{{ nu }}
 
     const SLACK_STATUS_API = "https://slack-status.com/api/v2.0.0/current"
-        print $"Getting Status from ($SLACK_STATUS_API) via NuShell"
+    print $"Getting Status from ($SLACK_STATUS_API) via NuShell"
     try {
         let slack_status = (http get $SLACK_STATUS_API | get status)
         print $"Slack Status: ($slack_status)"
