@@ -16,8 +16,15 @@ do
         break
     fi
 
-    STATUS=$(echo "$RESPONSE" | sed 's/.*"description":"\(.*\)"}}$/\1/')
+    # Bash Native extraction of the description
+    STATUS=$(echo ${RESPONSE#*\"status\":\{}})
+    STATUS_CLEAN=$(echo ${STATUS%%\}*})
+    DESCRIPTION_QUOTED=$(echo ${STATUS_CLEAN#*\"description\":\"})
+    DESCRIPTION=$(echo ${DESCRIPTION_QUOTED%%\"})
 
-    printf "%s Status: %s\n" "$SERVICE" "$STATUS"
+    # sed extraction
+    #DESCRIPTION=$(echo "$RESPONSE" | sed 's/.*"description":"\(.*\)"}}$/\1/')
+
+    printf "%s Status: %s\n" "$SERVICE" "$DESCRIPTION"
 
 done
