@@ -19,3 +19,8 @@ node_modules: $(package)
 run: node_modules
 	@echo running script
 	@npm run getstatus
+
+.PHONY: help
+help:
+	@grep -oE '^([a-zA-Z\.\-]+):+' Makefile | awk '/^[^.PHONY:]/ { gsub(/:/, " "); print $1}' | sort
+
