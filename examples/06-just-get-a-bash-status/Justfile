@@ -1,0 +1,15 @@
+urls := '''https://www.githubstatus.com/api/v2/summary.json 
+https://status.npmjs.org/api/v2/summary.json
+https://status.python.org/api/v2/summary.json'''
+
+print:
+	@echo {{ urls }}
+
+getstatus:
+	#!/usr/bin/env bash
+	URLS="{{ urls }}"
+	while read -r url
+	do
+		curl -skL "$url" | jq -r '"\(.page.name) \(.status.description)"'
+	done <<< $URLS
+

@@ -99,7 +99,7 @@ This is just one of many "hard edges" in Make that make it harder to use and les
 
 ## Just
 
-Just is a "task runner" rather than a "build system", it's sole purpose is to encode tasks (scripts, one-liners) related to a project into a file with a standard interface and allow them to be run either independently or in a dependency graph. Just borrows many of the concepts of Make but adds several features that make it superior for "just doing things", and simultaneously, simplifies it by removing some of the features that Make has that also can also contribute to it's complexity.  Just is written in Rust and on my Linux machine is a statically linked, single binary 4.6 MB in size. 
+Just is a "task runner" rather than a "build system", it's sole purpose is to encode tasks (scripts, one-liners) related to a project into a file with a standard interface and allow them to be run either independently or in a dependency graph. Just borrows many of the concepts of Make but adds several features that make it superior for "just doing things", and simultaneously, simplifies it by removing some of the features that Make has that also can also contribute to it's complexity.  Just is written in Rust and on my Linux machine is a statically linked, single binary 4.6 MB in size. To see some of the capabilities of Just, the [Just Github Repository](https://github.com:casey/just) has an examples directory where there is a "kitchen-sink" Justfile that gives a fairly comprehensive overview of the features and capabilities.  For our example problem we can view [06-just-get-a-bash-status](./examples/06-just-get-a-bash-status) as a comparison to the previous Make example.
 
 ## Nushell
 
