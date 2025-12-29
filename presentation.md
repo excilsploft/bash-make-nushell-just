@@ -4,6 +4,23 @@
 Initially when I pitched this presentation, I wanted to make it about deprecating 2 software tools in favor of 2 other tools, hence the title of the talk. As I created the examples for each of these tools around a simple problem, the more I became convinced that none of these 4 tools were all "good" or all "bad" and so I decided to orient the discussion toward the actual problem I was solving in my examples and showcase a few different solutions alongside the pros and cons of each those solutions. As a DevOps practitioner, most of my job is actually spent gluing various software together to give the appearance of a seamless system rather than the assemblage of bits and bobs cobbled together that it is. Like all users of adhesive, be it model builders, plumbers or woodworkers, a DevOps practitioner grows to enjoy the understanding of "glue", it's speed of use, it's strengths, it's weaknesses, it's failure modes and indeed maybe even it's offputting smell.  Oftentimes, what we most understand about a given "glue" is the practicality of it, it's ease of application, it's longevity or lack thereof and most of all that it will probably just be "good enough" for the purpose we are tasking it with.  To return to the role we inhabit as DevOps practitioners, we often find the best tool is the one we have and the second best tool is the one we can get and maintain the easiest. Too that end, I want to discuss two tools that are nearly universal on Unix-like systems, Bash and Make, as well as two tools that require us to install them, but require virtually no maintenance and whose utility outweigh the pain of acquisition, those tools being Just and NuShell. But, first we should showcase  the simple problem we are setting out to solve.
 
 
+
+## Requirements
+
+The [examples](./examples) require the following software versions to fully function:
+| Software | Version |
+|----------|---------|
+| Bash     | 4+      |
+| GNU Make | 3.81    |
+| cURL     | 8.7.1   |
+| jq       | 1.8.1   |
+| Just     | 1.43.1  |
+| NuShell  | 0.105.1 |
+
+
+*NOTE* Bash on most Mac machines is quite old, the Bash version in the examples uses Bash greater than 4+ (for associative arrays).  You can install a newer version using HomeBrew, just be sure to add it to your `PATH` environment variable first i.e. `export PATH=opt/homebrew/bin/bash:$PATH`
+
+
 ## Example Task
 
 In our daily roles as DevOps practitioners, we tend to have an unfortunate reliance on the internet and specifically, services available on the internet. Despite being relatively reliable, many of these services provide a status page that we can view to see if there are any past or current service incidents that will degrade our ability to complete our work. Let's create a simple script we can use to query the status of these services. Let's presume we need to retrieve the current state of the following services:
@@ -93,7 +110,7 @@ That stated, watching the 'Summary' JSON statuses of each of these services, as 
 
 In [example 4](./examples/04-make-a-docker-image/) we have slightly different solution to that of the example node script, we have a simple python script that does more-or-less the same thing, howver this our target is not a local install of the `node_modules` but of a Docker image. We have set the Makefile up so that the Docker image is rebuilt any time either the script, or the requirements.txt is changed. We can easily extend this Makefile to add the logic for more complext tagging or pushing to a remote image repository.  
 
-Because Make offers the `.PHONY` target, and because it has the ability to run recipes (both `.PHONY` and file targets) in a dependency chain, Make becomes a very enticing command runner.  We can encode a series of one-liners or even full scripts into recipes and use Makes target dependencies execute them in order.  Looking at [example 5](./examples/05-make-get-status), we have a simple bash for loop iterating overa Make variable and executing the familiar curl/JQ calls. One can see the downside almost immediately in using Make as task runner (rather than a Build System) by the fact we have to encode each line of our bBBash snippet into a single line (broken up with line continuation backslashes) and with Make's mandatory leading tab. This works but it is certainly not ideal.
+Because Make offers the `.PHONY` target, and because it has the ability to run recipes (both `.PHONY` and file targets) in a dependency chain, Make becomes a very enticing command runner.  We can encode a series of one-liners or even full scripts into recipes and use Makes target dependencies execute them in order.  Looking at [example 5](./examples/05-make-get-status), we have a simple bash for loop iterating over a Make variable and executing the familiar curl/JQ calls. One can see the downside almost immediately in using Make as task runner (rather than a Build System) by the fact we have to encode each line of our bBBash snippet into a single line (broken up with line continuation backslashes) and with Make's mandatory leading tab. This works but it is certainly not ideal.
 
 This is just one of many "hard edges" in Make that make it harder to use and less desirable from a perspective of "I want to just encode a set of command in a file and run it".  This latter desire is best filled by a purpose built tool, that being [Just](https://just.systems/)
 
@@ -125,7 +142,11 @@ Returning to [example 07-just-get-status](./examples/07-just-get-status), we can
 
 While perhaps not the greatest show case of NuShell, it is is easy to see how NuShell was able to request JSON data from the various service endpoints, deserialize that JSON and present it without using cURL or JQ, i.e. using built-in commands to NuShell.
 
-[example 08-just-get-a-polyglot](examples/08-just-get-a-polyglot/), 
+To showcase more of Justs features, in [example 08-just-get-a-polyglot](examples/08-just-get-a-polyglot/), we have a recipes that are implemented in 4 different languages (all using stanard library features). You can see how Just allows us to embed each language as a Shebang recipe and to verify we have the proper binaries in place.
+
+Both Just and Make execute each recipe in it's own shell process, this effectively means that we cannot share state that is modified between recipe runs. 
+
+
 
 
 
