@@ -10,12 +10,13 @@ Initially when I pitched this presentation, I wanted to make it about deprecatin
 The [examples](./examples) require the following software versions to fully function:
 | Software | Version |
 |----------|---------|
-| Bash     | 4+      |
-| GNU Make | 3.81    |
-| cURL     | 8.7.1   |
-| jq       | 1.8.1   |
+| Bash     | >=4     |
+| GNU Make | >=3.81  |
+| cURL     | >=8.5   |
+| jq       | >=1.7   |
 | Just     | 1.43.1  |
 | NuShell  | 0.105.1 |
+| Docker   | >= 28.0 |
 
 
 *NOTE* Bash on most Mac machines is quite old, the Bash version in the examples uses Bash greater than 4+ (for associative arrays).  You can install a newer version using HomeBrew, just be sure to add it to your `PATH` environment variable first i.e. `export PATH=opt/homebrew/bin/bash:$PATH`
