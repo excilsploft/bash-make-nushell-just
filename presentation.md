@@ -115,6 +115,17 @@ Nushell is a shell and programming language written in Rust, it is statically li
 1. Strongly typed and it's internal pipelines send stuctured data vs text, making this more similar to Powershell than to BASH.  
 2. The Nushell language is strongly based on functional programming languages, this means that variables are immutable by default and nearly every operation returns a value.  
 3. NuShell has a very comprehensive set of builtin commands and filters that understand many serialization formats from typical formats such as JSON, YAML, and CSV to things such as ICS (iCalendar) and MessagePack.  
+4. Nu can invoke existing command line utilities and has features that allow transforming the line based output to the rich, structured data types Nu built-ins produce.
+
+Returning to [example 07-just-get-status](./examples/07-just-get-status), we can see some now familiar features but with some new introductions:
+1. We have a implemented a Shebang Recipe in NuShell.  
+2. We have made that recipe Parameterized so that the logic NuShell runs get's its input from the Justfile recipe parameters.  
+3. We invoke this Private recipe with named recipes that have the Private recipe as a dependency.  
+4. We have a recipe `get-all` that invokes each named recipe as dependencies and does this in parallel rather than serially.  
+
+While perhaps not the greatest show case of NuShell, it is is easy to see how NuShell was able to request JSON data from the various service endpoints, deserialize that JSON and present it without using cURL or JQ, i.e. using built-in commands to NuShell.
+
+[example 08-just-get-a-polyglot](examples/08-just-get-a-polyglot/), 
 
 
 
