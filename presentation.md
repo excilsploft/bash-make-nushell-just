@@ -19,7 +19,7 @@ The [examples](./examples) require the following software versions to fully func
 | Docker   | >= 28.0 |
 
 
-*NOTE* Bash on most Mac machines is quite old, the Bash version in the examples uses Bash greater than 4+ (for associative arrays).  You can install a newer version using HomeBrew, just be sure to add it to your `PATH` environment variable first i.e. `export PATH=opt/homebrew/bin/bash:$PATH`
+**NOTE** Bash on most Mac machines is quite old, the Bash version in the examples uses Bash greater than 4+ (for associative arrays).  You can install a newer version using HomeBrew, just be sure to add it to your `PATH` environment variable first i.e. `export PATH=opt/homebrew/bin/bash:$PATH`
 
 
 ## Example Task
