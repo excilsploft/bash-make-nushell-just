@@ -1,7 +1,6 @@
 
 gh-status-url := "https://www.githubstatus.com/api/v2/summary.json"
 npm-status-url := "https://status.npmjs.org/api/v2/summary.json"
-
 pypi-status-url := "https://status.python.org/api/v2/summary.json"
 
 # Get all The statuses

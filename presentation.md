@@ -99,12 +99,22 @@ This is just one of many "hard edges" in Make that make it harder to use and les
 
 ## Just
 
-Just is a "task runner" rather than a "build system", it's sole purpose is to encode tasks (scripts, one-liners) related to a project into a file with a standard interface and allow them to be run either independently or in a dependency graph. Just borrows many of the concepts of Make but adds several features that make it superior for "just doing things", and simultaneously, simplifies it by removing some of the features that Make has that also can also contribute to it's complexity.  Just is written in Rust and on my Linux machine is a statically linked, single binary 4.6 MB in size. To see some of the capabilities of Just, the [Just Github Repository](https://github.com:casey/just) has an examples directory where there is a "kitchen-sink" Justfile that gives a fairly comprehensive overview of the features and capabilities.  For our example problem we can view [06-just-get-a-bash-status](./examples/06-just-get-a-bash-status) as a comparison to the previous Make example.
+Just is a "task runner" rather than a "build system", it's sole purpose is to encode tasks (scripts, one-liners) related to a project into a file with a standard interface and allow them to be run either independently or in a dependency graph. Just borrows many of the concepts of Make but adds several features that make it superior for "just doing things", and simultaneously, simplifies it by removing some of the features that Make has that also can also contribute to it's complexity.  Just is written in Rust and on my Linux machine is a statically linked, single binary 4.6 MB in size. To see some of the capabilities of Just, the [Just Github Repository](https://github.com:casey/just) has an examples directory where there is a "kitchen-sink" Justfile that gives a fairly comprehensive overview of the features and capabilities.  For our example problem we can view [06-just-get-a-bash-status](./examples/06-just-get-a-bash-status) as a comparison to the previous Make example [05-make-get-status](./examples/05-make-get-status). The main differences are:
+
+1. Make has the ability to have a variable that is a list, Just variables are only strings.
+2. Make has a built in function to tokenize a string into words, in Just we needed to "shell out" to awk to tokenize the string variable"
+3. Make only allows single line recipes that have to be concatenated, with new line escapes, Just allows multi-line "Shebang Recipes"
+4. Make allows Make variables to be interpolated in recipes but the escaping "$" is needed if that symbol has special significance to the executing shell.  Just has a simpler "double brace" expansion that does not collide with shell vars.
+
+These examples don't show the full scope of the differences between the two tools nor does it highlight the file dependency interrogation that Make provides and Just does not. However, as a "Task Runner" vs a "Build System", Just has the edge by allowing the multi-line shebang recipes. In [example 07-just-get-status](./examples/07-just-get-status), there is an iteration on the previous two examples (in Make and Just respectively) but introducing a new Just feature as well as a recipe in NuShell, for that reason it would be a good idea to give a quick overview on NuShell 
 
 ## Nushell
 
-Nushell is a new shell and programming language written in Rust. The shell has many built-in commands and allows invoking many existing commandline utilities. The shell programming language is oriented around a couple of key features:
-1. Strongly typed vs everything is a string in BASH, this means things coming through the pipeline is data, making this more similar to Powershell than to BASH.
-2. The Nushell language is strongly based on functional programming languages, this means that variables are immutable by default and nearly every operation returns a value.
+Nushell is a shell and programming language written in Rust, it is statically linked and on my Linux machine is 43MB in size. The shell has many built-in commands and allows invoking many existing commandline utilities. The shell programming language is oriented around a couple of key features:
+
+1. Strongly typed and it's internal pipelines send stuctured data vs text, making this more similar to Powershell than to BASH.  
+2. The Nushell language is strongly based on functional programming languages, this means that variables are immutable by default and nearly every operation returns a value.  
+3. NuShell has a very comprehensive set of builtin commands and filters that understand many serialization formats from typical formats such as JSON, YAML, and CSV to things such as ICS (iCalendar) and MessagePack.  
+
 
 
