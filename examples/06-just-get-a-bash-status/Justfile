@@ -1,10 +1,12 @@
-urls := '''https://www.githubstatus.com/api/v2/summary.json 
+urls := '''https://www.githubstatus.com/api/v2/summary.json
 https://status.npmjs.org/api/v2/summary.json
 https://status.python.org/api/v2/summary.json'''
 
-print:
-	@echo {{ urls }}
+github := shell("echo $1 | awk '{print $1}'", urls)
+npm := shell("echo $1 | awk '{print $2}'", urls)
+pypi := shell("echo $1 | awk '{print $3}'", urls)
 
+# In a Bash loop, get all the URL Statuses
 getstatus:
 	#!/usr/bin/env bash
 	URLS="{{ urls }}"
@@ -12,4 +14,23 @@ getstatus:
 	do
 		curl -skL "$url" | jq -r '"\(.page.name) \(.status.description)"'
 	done <<< $URLS
+
+
+# Get Them All
+allstatus: githubstatus npmstatus pypitatus
+
+# Get Github Status
+githubstatus:
+   @curl -skL {{ github }} | jq -r '"\(.page.name):\t\(.status.description)"'
+
+
+# Get NPM Status
+npmstatus:
+   @curl -skL {{ npm }} | jq -r '"\(.page.name):\t\(.status.description)"'
+
+
+# Get PyPi Status
+pypitatus:
+   @curl -skL {{ pypi }} | jq -r '"\(.page.name):\t\(.status.description)"'
+
 
