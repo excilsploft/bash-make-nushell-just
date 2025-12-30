@@ -145,9 +145,16 @@ While perhaps not the greatest show case of NuShell, it is is easy to see how Nu
 
 To showcase more of Justs features, in [example 08-just-get-a-polyglot](examples/08-just-get-a-polyglot/), we have a recipes that are implemented in 4 different languages (all using stanard library features). You can see how Just allows us to embed each language as a Shebang recipe and to verify we have the proper binaries in place.
 
-Both Just and Make execute each recipe in it's own shell process, this effectively means that we cannot share state that is modified between recipe runs. 
+Both Just and Make execute each recipe in it's own shell process, this effectively means that we cannot share state that is modified or created between recipe runs. In [example 09-just-store-state](./examples/09-just-store-state), we will use one of the serialization formats NuShell speaks natively, Sqlite, to save and retrieve state between recipes in a Justfile. This example creates a local Sqlite datbase file relative to the Justfile, add a table and some data in one recipe and then retrieve that data in another recipe, thus persisting a kind of state between recipes.
 
+Finally, in [example 10-just-a-ci](./examples/10-just-a-ci) we use NuShell's ability to open an in memory Sqlite database in a recipe and use it as a control process for a minimal, relatively unsophisticated CI/Build server in a single Justfile. In this example, we leverage a feature of Just, recursively invoking Just in a recipe as a child process, this allows us to do the following:  
 
+1. Run one recipe with an open, in-memory Sqlite database as a "controller" process.  
+2. Clone a repository and execute the build command.  
+3. Record the initial HEAD commit hash.  
+4. Poll the remote repository on a fixed interval for commit hash changes.  
+5. Execute the build command in different recipe.  
+6. Record the new commit hash in the controller recipe and resume polling.  
 
 
 
