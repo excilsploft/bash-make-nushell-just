@@ -16,8 +16,22 @@ do
         break
     fi
 
-    STATUS=$(echo "$RESPONSE" | jq -r '(.status.description)')
+    DESCRIPTION=$(echo "$RESPONSE" | jq -r '(.status.description)')
+    INDICATOR=$(echo "$RESPONSE" | jq -r '(.status.indicator)')
 
-    printf "%s Status: %s\n" "$SERVICE" "$STATUS"
+    case "$INDICATOR" in 
+        critcal)
+            printf "%s Status:\033[31m%s\033[0m\n"  "$SERVICE" "$DESCRIPTION"
+            ;;
+         major)
+            printf "%s Status:\033[36m%s\033[0m\n"  "$SERVICE" "$DESCRIPTION"
+            ;;
+         minor)
+            printf "%s Status:\033[33m%s\033[0m\n"  "$SERVICE" "$DESCRIPTION"
+            ;;
+            *)
+            printf "%s Status:\033[32m%s\033[0m\n"  "$SERVICE" "$DESCRIPTION"
+            ;;
+    esac
 
 done

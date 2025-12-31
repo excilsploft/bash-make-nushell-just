@@ -22,6 +22,8 @@ do
     DESCRIPTION_QUOTED=$(echo ${STATUS_CLEAN#*\"description\":\"})
     DESCRIPTION=$(echo ${DESCRIPTION_QUOTED%%\"})
 
+
+
     # sed extraction
     #DESCRIPTION=$(echo "$RESPONSE" | sed 's/.*"description":"\(.*\)"}}$/\1/')
 
