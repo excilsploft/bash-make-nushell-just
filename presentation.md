@@ -85,7 +85,7 @@ Let's take our example of retrieving a set of status JSON reponses, parsing them
 
 ## GNU Make
 
-There are several flavors of Make but I will exclusively focus on GNU Make for this discussion. Make is a tool that in general, facilitates the transformation of source code into executable code. It does this by reading the build instructions from a file called a makefile and executing those instructions, similar to how the Docker daemon constructs a Docker image from instructions contained in a Dockerfile. The key thing to remember is that Make is the "baker" who "bakes" the products by following the "recipes" encoded in the makefile. Make is, in short, a "build system". There is a very fun ACM whitepaper called [Build Systems à la Carte](https://www.microsoft.com/en-us/research/wp-content/uploads/2018/03/build-systems.pdf) that define and discuss various build systems with some surprising inclusions (Microsoft Excel), the key feature being the distillation of a dependency graph of steps and running only the necessary steps to for the desired output, i.e. if a step or dependency is already satisfied, then that step will be skipped on subsequent runs.
+There are several flavors of Make but I will exclusively focus on GNU Make for this discussion. Make is a tool that in general, facilitates the transformation of source code into executable code. It does this by reading the build instructions from a file called a `Makefile` and executing those instructions, similar to how the Docker daemon constructs a Docker image from instructions contained in a Dockerfile. The key thing to remember is that Make is the "baker" who "bakes" the products by following the "recipes" encoded in the makefile. Make is, in short, a "build system". There is a very fun ACM whitepaper called [Build Systems à la Carte](https://www.microsoft.com/en-us/research/wp-content/uploads/2018/03/build-systems.pdf) that define and discuss various build systems with some surprising inclusions (Microsoft Excel), the key feature being the distillation of a dependency graph of steps and running only the necessary steps in that graph for the desired output, i.e. if a step or dependency is already satisfied, then that step will be skipped on subsequent runs.
 
 Let's look closer at the `Makefile` in [example 3](./exampoles/03-node-get-status)
 
@@ -96,7 +96,7 @@ Make allows us in this example to do the following things:
  4. The `Makefile` could theoretically be extended even further to handle the installation of proper version of node or other dependencies.  
 
 
-Make knows which steps to run or skip by watching the modified time of the inputs (i.e. the "dependencies") and the outputs (i.e. the "targets") and running only the steps needed to produce targets with updated modified timestamps.  This has the effect of Make being file oriented, it "watches" source files to produce output files". Make does have a feature to run "recipes" wherein the output is not a file, maybe something like a call to a REST service or storing a value in a database. This type of "target" is called a "`.PHONY` target", it is "PHONY" because it produces no files.  This feature introduces a compelling use case for DevOps practitioners: The ability to string a chain of commands that are dependent on one after another yet don't necessarily rely on filesystem changes   A couple of examples of this could be:
+Make knows which steps to run or skip by watching the modified time of the inputs (i.e. the "dependencies") and the outputs (i.e. the "targets") and running only the steps needed to produce the targets with that have updated, modified time timestamps.  This has the effect of Make being very file oriented, it "watches" source files to produce "target" files. Make does have a feature to run "recipes" wherein the output is not a file, maybe something like a call to a REST service or storing a value in a database. This type of "target" is called a "`.PHONY` target", it is "PHONY" because it produces no files.  This feature introduces a compelling use case for DevOps practitioners: The ability to string a chain of commands that are dependent on one after another yet don't necessarily rely on filesystem changes   A couple of examples of this could be:
 
 1. Watching terraform files to automatically create an updated terraform plan and apply.  
 2. Building a Docker image, tagging it and pushing to an image repository when the Dockerfile has changed.  
@@ -104,8 +104,8 @@ Make knows which steps to run or skip by watching the modified time of the input
 
 Take our example of querying the overall health status of NPM, PyPi and Github, we could construct a make file that requires each of these services be available to perform the following steps:
 1. Pull a repo from Github containing Node and Python code.  
-2. Install the node and python dependencies..
-3. Build and deploy the subsequent application. ..
+2. Install the node and python dependencies.  
+3. Build and deploy the subsequent application.  
 
 That stated, watching the 'Summary' JSON statuses of each of these services, as we have in prior examples, is probably not the best way to assess the functionality of the services we would require in the prior scenario.
 
