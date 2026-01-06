@@ -1,24 +1,29 @@
 #!/usr/bin/env bash
 
-declare -A URLS
-URLS=(Github "https://www.githubstatus.com/api/v2/summary.json"
-      NPM "https://status.npmjs.org/api/v2/summary.json"
-      PyPi "https://status.python.org/api/v2/summary.json")
+set -euo pipefail
 
-for url in "${!URLS[@]}"
+# Let's use a Bash feature, to declare and populate an
+
+URLS=("https://www.githubstatus.com/api/v2/summary.json"
+      "https://status.npmjs.org/api/v2/summary.json"
+      "https://status.python.org/api/v2/summary.json")
+
+# Let's iterate the associative array, query the summary json urls with cURL and then use jq to extract the page.name , status.indicator, and status.description keys
+for url in "${URLS[@]}"
 do
-    SERVICE="$url"
-    SERVICE_URL="${URLS[$url]}"
-    RESPONSE=$(curl -skL "$SERVICE_URL")
+    RESPONSE=$(curl -skL "$url")
     if [[ $? -ne 0 ]]
     then
         printf "Error Getting Status from %s\n" "$url"
         break
     fi
 
+    # Get the desired keys from the response
+    SERVICE=$(echo "$RESPONSE" | jq -r '.page.name')
     DESCRIPTION=$(echo "$RESPONSE" | jq -r '(.status.description)')
     INDICATOR=$(echo "$RESPONSE" | jq -r '(.status.indicator)')
 
+    # evaluate the Indicator string, match and print
     case "$INDICATOR" in 
         critcal)
             printf "%s Status:\033[31m%s\033[0m\n"  "$SERVICE" "$DESCRIPTION"
