@@ -1,3 +1,4 @@
+# Print words with the terminal color console control codes
 print:
     @printf "\033[39m"
     @printf "\033[48;5;15m"
@@ -7,6 +8,7 @@ print:
     @printf "\033[49m"
 
 
+# Use Nu shell to print a some color coded words, this is "the hard way"
 colortime:
     #!/usr/bin/env nu
 
