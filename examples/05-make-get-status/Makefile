@@ -18,7 +18,6 @@ getstatus:
 		fi ;\
 	done
 
-
 .PHONY: all
 all: githubstatus npmstatus pypistatus
 
@@ -37,4 +36,3 @@ pypistatus:
 .PHONY: help
 help:
 	@grep -oE '^([a-zA-Z\.\-]+):+' Makefile | awk '/^[^.PHONY:]/ { gsub(/:/, " "); print $1}' | sort
-
