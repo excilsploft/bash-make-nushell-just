@@ -1,11 +1,26 @@
 # Print words with the terminal color console control codes
-print:
-    @printf "\033[39m"
-    @printf "\033[48;5;15m"
-    @printf "\033[38;5;206;48;5;15mpink\n"
-    @printf "\033[38;5;19;48;5;15mblue\n"
-    @printf "\033[39;49m"
-    @printf "\033[49m"
+colorwithbash:
+    #!/usr/bin/env bash
+    declare -A COLOR_TABLE
+    COLOR_TABLE=(4 blue \
+                 13 pink \
+                 1 red \
+                 11 yellow \
+                 2 green)
+    NUM_ELEMENTS="${#COLOR_TABLE[*]}"
+    declare -a KEY_ARRAY
+    KEY_ARRAY=($(echo "${!COLOR_TABLE[*]}"))
+    printf "\033[39m"
+    i=1
+    while (( i <= 1000 ))
+    do
+        NUMBER=$(("$RANDOM" % "$NUM_ELEMENTS" ))
+        KEY="${KEY_ARRAY[$NUMBER]}"
+        COLOR="${COLOR_TABLE[$KEY]}"
+        printf "\033[38;5;%sm%s " "$KEY" "$COLOR"
+        i=$((i+1))
+    done
+    printf "\033[39m"
 
 
 # Use Nu shell to print a some color coded words, this is "the hard way"
@@ -15,37 +30,14 @@ colortime:
     const COLOR_TABLE = [[color code]; [blue 4] [pink 13] [ red 1 ] [yellow 11] [green 2]]
 
     print -n (ansi reset)
-    print -n (ansi  --escape "48,5,15m")
     mut x = 0
 
-    while $x < 100 {
+    while $x < 1000 {
         let rand_num = ( random int 0..($COLOR_TABLE | drop 1 | length))
         let color_code = ($COLOR_TABLE | select $rand_num)
-        let code = $"38;5;($color_code | get code | first);48;5;15m"
+        let code = $"38;5;($color_code | get code | first)m"
         let color = ($color_code | get color | first)
         print -n $"(ansi --escape ($code))($color) "
-        $x = $x + 1
-    }
-    print (ansi reset)
-
-# Use Nu shell to print a some color coded words, this is "the easy way"
-easycolortime:
-    #!/usr/bin/env nu
-
-    const COLOR_TABLE = [[color code]; [blue 4] [purple 13] [red 1] [yellow 11] [green 2]]
-
-    print -n (ansi reset)
-    print -n (ansi  --escape "48,5,15m")
-    mut x = 0
-
-    while $x < 100 {
-        let rand_num = ( random int 0..($COLOR_TABLE | drop 1 | length))
-        let color_code = ($COLOR_TABLE | select $rand_num)
-        let code = ($color_code | get code | first)
-        let color = ($color_code | get color | first)
-        ansi $color
-        print -n $color
-        print (ansi reset)
         $x = $x + 1
     }
     print (ansi reset)
