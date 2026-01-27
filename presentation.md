@@ -1,22 +1,22 @@
 # Intro
 
 
-Initially when I pitched this presentation, I wanted to make it about deprecating 2 software tools in favor of 2 other tools, hence the title of the talk. As I created the examples for each of these tools around a simple problem, the more I became convinced that none of these 4 tools were all "good" or all "bad" and so I decided to orient the discussion toward the actual problem I was solving in my examples and showcase a few different solutions alongside the pros and cons of each those solutions. As a DevOps practitioner, most of my job is actually spent gluing various software together to give the appearance of a seamless system rather than the assemblage of bits and bobs cobbled together that it is. Like all users of adhesive, be it model builders, plumbers or woodworkers, a DevOps practitioner grows to enjoy the understanding of "glue", it's speed of use, it's strengths, it's weaknesses, it's failure modes and indeed maybe even it's offputting smell.  Oftentimes, what we most understand about a given "glue" is the practicality of it, it's ease of application, it's longevity or lack thereof and most of all that it will probably just be "good enough" for the purpose we are tasking it with.  To return to the role we inhabit as DevOps practitioners, we often find the best tool is the one we have and the second best tool is the one we can get and maintain the easiest. Too that end, I want to discuss two tools that are nearly universal on Unix-like systems, Bash and Make, as well as two tools that require us to install them, but require virtually no maintenance and whose utility outweigh the pain of acquisition, those tools being Just and NuShell. But, first we should showcase  the simple problem we are setting out to solve.
+Initially when I pitched this presentation, I wanted to make it about deprecating 2 software tools in favor of 2 other tools, hence the title of the talk. As I created the examples for each of these tools around a simple problem, the more I became convinced that none of these 4 tools were all "good" or all "bad" and so I decided to orient the discussion toward the actual problem I was solving in my examples and showcase a few different solutions alongside the pros and cons of each those solutions. As a DevOps practitioner, most of my job is actually spent gluing various software together to give the appearance of a seamless system rather than the assemblage of bits and bobs cobbled together that it is. Like all users of adhesive, be it model builders, plumbers or woodworkers, a DevOps practitioner grows to enjoy the understanding of "glue", it's speed of use, it's strengths, it's weaknesses, it's failure modes and indeed maybe even it's offputting smell.  Oftentimes, what we most understand about a given "glue" is the practicality of it, it's ease of application, it's longevity or lack thereof and most of all that it will probably just be "good enough" for the purpose we are tasking it with.  To return to the role we inhabit as DevOps practitioners, we often find the best tool is the one we have and the second best tool is the one we can get and maintain the easiest. To that end, I want to discuss two tools that are nearly universal on Unix-like systems, Bash and Make, as well as two tools that require us to install them, but require virtually no maintenance and whose utility outweigh the pain of acquisition, those tools being Just and NuShell. But, first we should showcase  the simple problem we are setting out to solve.
 
 
 
 ## Requirements
 
 The [examples](./examples) require the following software versions to fully function:
-| Software | Version |
-|----------|---------|
-| Bash     | >=4     |
-| GNU Make | >=3.81  |
-| cURL     | >=8.5   |
-| jq       | >=1.7   |
-| Just     | 1.43.1  |
-| NuShell  | 0.105.1 |
-| Docker   | >= 28.0 |
+| Software | Version |  
+|----------|---------|  
+| Bash     | >=4     |  
+| GNU Make | >=3.81  |  
+| cURL     | >=8.5   |  
+| jq       | >=1.7   |  
+| Just     | 1.43.1  |  
+| NuShell  | 0.105.1 |  
+| Docker   | >= 28.0 |  
 
 
 **NOTE** Bash on most Mac machines is quite old, the Bash version in the examples uses Bash greater than 4+ (for associative arrays).  You can install a newer version using HomeBrew, just be sure to add it to your `PATH` environment variable first i.e. `export PATH=opt/homebrew/bin/bash:$PATH`
@@ -81,13 +81,13 @@ To remedy this we can install a command line JSON parser/filter called [jq](http
 
 So unfortunately, the lack of Bash built-ins for handling HTTPs and decoding structured data show some deficits to a native Bash solution, though with the installation of cURL and JQ, those are quickly overcome.
 
-Let's take our example of retrieving a set of status JSON reponses, parsing them and displaying into the familiar realm of being a DevOps/build engineer.  Let's say that a team member has written a simple utility to do this in Node.js and put it in a repo to clone and run at will.  This approach can be seen here in [example 3](03-node-get-status).  We can see the developer in this case, opted to use the Axios HTTP library instead of the native fetch and also included a library to colorize the console outpput. These packages require installation and may require future upgrades for security reasons. This is the perfect environment to introduce Make.
+Let's take our example of retrieving a set of status JSON reponses, parsing them and displaying into the familiar realm of being a DevOps/build engineer.  Let's say that a team member has written a simple utility to do this in Node.js and put it in a repo to clone and run at will.  This approach can be seen here in [example 3](./examples/03-node-get-status).  We can see the developer in this case, opted to use the Axios HTTP library instead of the native fetch and also included a library to colorize the console output. These packages require installation and may require future upgrades for security reasons. This is the perfect environment to introduce Make.
 
 ## GNU Make
 
 There are several flavors of Make but I will exclusively focus on GNU Make for this discussion. Make is a tool that in general, facilitates the transformation of source code into executable code. It does this by reading the build instructions from a file called a `Makefile` and executing those instructions, similar to how the Docker daemon constructs a Docker image from instructions contained in a Dockerfile. The key thing to remember is that Make is the "baker" who "bakes" the products by following the "recipes" encoded in the makefile. Make is, in short, a "build system". There is a very fun ACM whitepaper called [Build Systems à la Carte](https://www.microsoft.com/en-us/research/wp-content/uploads/2018/03/build-systems.pdf) that define and discuss various build systems with some surprising inclusions (Microsoft Excel), the key feature being the distillation of a dependency graph of steps and running only the necessary steps in that graph for the desired output, i.e. if a step or dependency is already satisfied, then that step will be skipped on subsequent runs.
 
-Let's look closer at the `Makefile` in [example 3](./exampoles/03-node-get-status)
+Let's look closer at the `Makefile` in [example 3](./examples/03-node-get-status)
 
 Make allows us in this example to do the following things:
  1. Declare the node_modules directory dependent on both `package.json` and `package-lock.json` files   
@@ -137,11 +137,11 @@ Nushell is a shell and programming language written in Rust, it is statically li
 
 Returning to [example 07-just-get-status](./examples/07-just-get-status), we can see some now familiar features but with some new introductions:
 1. We have a implemented a Shebang Recipe in NuShell.  
-2. We have made that recipe Parameterized so that the logic NuShell runs get's its input from the Justfile recipe parameters.  
+2. We have made that recipe Parameterized so that the logic NuShell runs gets input from the Justfile recipe parameters.  
 3. We invoke this Private recipe with named recipes that have the Private recipe as a dependency.  
 4. We have a recipe `get-all` that invokes each named recipe as dependencies and does this in parallel rather than serially.  
 
-While perhaps not the greatest show case of NuShell, it is is easy to see how NuShell was able to request JSON data from the various service endpoints, deserialize that JSON and present it without using cURL or JQ, i.e. using built-in commands to NuShell.
+While perhaps not the greatest show case of NuShell, it is is easy to see how NuShell was able to request JSON data from the various service endpoints, deserialize that JSON and present it without using cURL or JQ, i.e. using built-in commands to compiled directly in the NuShell binary.
 
 To showcase more of Justs features, in [example 08-just-get-a-polyglot](examples/08-just-get-a-polyglot/), we have a recipes that are implemented in 4 different languages (all using stanard library features). You can see how Just allows us to embed each language as a Shebang recipe and to verify we have the proper binaries in place.
 

@@ -6,13 +6,14 @@ docker-random-string := choose('16', HEX)
 docker-image := "golang:1.26rc1-trixie"
 
 # Setup the process (make directories and clone)
+[private]
 setup:
     test -d {{ workspace }} && rm -rf {{ workspace }} || mkdir -p {{ workspace }}
     git clone --single-branch --depth 1 --sparse -b {{ git-branch }} {{ git-repo }} {{ workspace }}
     just build
 
 # Start the controller process
-start:
+start: setup
     #!/usr/bin/env nu
 
     use std/log
@@ -35,18 +36,27 @@ start:
         log info "Start: Checking if we have any git updates"
         let commit_status = (^git ls-remote --heads --quiet | lines | split column -r '\s+' | where $it.column2 =~ $"refs/heads/($GIT_BRANCH)")
         let previous_commit = ($db | query db "SELECT head FROM commits")
-        print $"previous: ($previous_commit.head)\ncommit: ($commit_status.column1)"
+        log info $"Start: stored commit=($previous_commit.head | first ) current commit=($commit_status.column1 | first)"
         if (($previous_commit.head | first) != ($commit_status.column1 | first)) {
+            let new_commit = ($commit_status.column1 | first)
             try {
-                ^git clean -ffdx
-                ^git pull
+                let git_clean_logs = (^git clean -ffdx | lines)
+                let git_pull_logs = (^git pull | lines)
+
+                $git_clean_logs | each { |e| log info $"Start: Git logs ($e)"}
+                $git_pull_logs | each { |e| log info $"Start: Git logs ($e)"}
+
            } catch {|err|
                log error "Error pulling new commit"
                break
            }
            just build
+           log info $"Start: Storing new commit hash: ($new_commit)"
+           stor update --table-name commits --update-record  {head: $new_commit } 
+           
         }
-       sleep 10min
+       log info "Start: Sleeping for 3 minutes until we poll again"
+       sleep 3min
     }
 
 # run the build command
@@ -75,7 +85,10 @@ build:
     log info $"Build: Checking docker container ($container_pid) is running ($docker_container_status)"
     log info "Build: Attempting to build"
     try {
-        ^docker container exec $container_pid sh -c "make build"
+        let build_command_logs = (docker container exec $container_pid sh -c "make build" | lines)
+        $build_command_logs | each { |e|
+            log info $"Build Command: ($e)"
+        }
     } catch {|err|
         log error $"Build: Error ($err)"
         ^docker rm --force $container_pid
@@ -83,7 +96,8 @@ build:
     }
 
     log info "Build: Done building"
-    ^docker rm --force $container_pid
+    let docker_remove = (docker rm --force $container_pid | lines | first)
+    log info $"Build: Removed container ($docker_remove)"
 
 # Delete the Workspace
 clean:
