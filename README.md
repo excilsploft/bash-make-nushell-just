@@ -16,5 +16,14 @@ The [examples](./examples) require the following software versions to fully func
 | Docker   | >= 28.0 |  
 
 
-### Caveats
+## Caveats
 I made no effort to make this work on Windows, but with the correct tweaks, it should esepecially on WSL
+
+
+## Software URLS
+
+[NuShell](https://www.nushell.sh/)
+[Just](https://just.systems/)
+[GNU Make](https://www.gnu.org/software/make/)
+[GNU Bash](https://www.gnu.org/software/bash/)
+[jq](https://jqlang.org/)
