@@ -1,9 +1,14 @@
+---
+author: Kyle Jones
+date: MMMM dd, YYYY
+paging: Slide %d / %d
+---
 # Intro
 
 
 Initially when I pitched this presentation, I wanted to make it about deprecating 2 software tools in favor of 2 other tools, hence the title of the talk. As I created the examples for each of these tools around a simple problem, the more I became convinced that none of these 4 tools were all "good" or all "bad" and so I decided to orient the discussion toward the actual problem I was solving in my examples and showcase a few different solutions alongside the pros and cons of each those solutions. As a DevOps practitioner, most of my job is actually spent gluing various software together to give the appearance of a seamless system rather than the assemblage of bits and bobs cobbled together that it is. Like all users of adhesive, be it model builders, plumbers or woodworkers, a DevOps practitioner grows to enjoy the understanding of "glue", it's speed of use, it's strengths, it's weaknesses, it's failure modes and indeed maybe even it's offputting smell.  Oftentimes, what we most understand about a given "glue" is the practicality of it, it's ease of application, it's longevity or lack thereof and most of all that it will probably just be "good enough" for the purpose we are tasking it with.  To return to the role we inhabit as DevOps practitioners, we often find the best tool is the one we have and the second best tool is the one we can get and maintain the easiest. To that end, I want to discuss two tools that are nearly universal on Unix-like systems, Bash and Make, as well as two tools that require us to install them, but require virtually no maintenance and whose utility outweigh the pain of acquisition, those tools being Just and NuShell. But, first we should showcase  the simple problem we are setting out to solve.
 
-
+---
 
 ## Requirements
 
@@ -21,6 +26,7 @@ The [examples](./examples) require the following software versions to fully func
 
 **NOTE** Bash on most Mac machines is quite old, the Bash version in the examples uses Bash greater than 4+ (for associative arrays).  You can install a newer version using HomeBrew, just be sure to add it to your `PATH` environment variable first i.e. `export PATH=opt/homebrew/bin/bash:$PATH`
 
+---
 
 ## Example Task
 
@@ -67,11 +73,14 @@ Here is an excerpt of the JSON response we get when querying [Github's status pa
   }
 }
 ```
+---
 
 What we are going to focus on for the purposes of the demo, is the `status` block and specifically it's nested member `description`.
 
 
 Being a pragmatist, let's start with the simplest tool at hand Bash and cURL, but first a digression into Bash.
+
+---
 
 ## BASH
 
@@ -82,6 +91,8 @@ To remedy this we can install a command line JSON parser/filter called [jq](http
 So unfortunately, the lack of Bash built-ins for handling HTTPs and decoding structured data show some deficits to a native Bash solution, though with the installation of cURL and JQ, those are quickly overcome.
 
 Let's take our example of retrieving a set of status JSON reponses, parsing them and displaying into the familiar realm of being a DevOps/build engineer.  Let's say that a team member has written a simple utility to do this in Node.js and put it in a repo to clone and run at will.  This approach can be seen here in [example 3](./examples/03-node-get-status).  We can see the developer in this case, opted to use the Axios HTTP library instead of the native fetch and also included a library to colorize the console output. These packages require installation and may require future upgrades for security reasons. This is the perfect environment to introduce Make.
+
+---
 
 ## GNU Make
 
@@ -115,6 +126,8 @@ Because Make offers the `.PHONY` target, and because it has the ability to run r
 
 This is just one of many "hard edges" in Make that make it harder to use and less desirable from a perspective of "I want to just encode a set of command in a file and run it".  This latter desire is best filled by a purpose built tool, that being [Just](https://just.systems/)
 
+---
+
 ## Just
 
 Just is a "task runner" rather than a "build system", it's sole purpose is to encode tasks (scripts, one-liners) related to a project into a file with a standard interface and allow them to be run either independently or in a dependency graph. Just borrows many of the concepts of Make but adds several features that make it superior for "just doing things", and simultaneously, simplifies it by removing some of the features that Make has that also can also contribute to it's complexity.  Just is written in Rust and on my Linux machine is a statically linked, single binary 4.6 MB in size. To see some of the capabilities of Just, the [Just Github Repository](https://github.com:casey/just) has an examples directory where there is a "kitchen-sink" Justfile that gives a fairly comprehensive overview of the features and capabilities.  For our example problem we can view [06-just-get-a-bash-status](./examples/06-just-get-a-bash-status) as a comparison to the previous Make example [05-make-get-status](./examples/05-make-get-status). The main differences are:
@@ -125,6 +138,8 @@ Just is a "task runner" rather than a "build system", it's sole purpose is to en
 4. Make allows Make variables to be interpolated in recipes but the escaping "$" is needed if that symbol has special significance to the executing shell.  Just has a simpler "double brace" expansion that does not collide with shell vars.
 
 These examples don't show the full scope of the differences between the two tools nor does it highlight the file dependency interrogation that Make provides and Just does not. However, as a "Task Runner" vs a "Build System", Just has the edge by allowing the multi-line shebang recipes. In [example 07-just-get-status](./examples/07-just-get-status), there is an iteration on the previous two examples (in Make and Just respectively) but introducing a new Just feature as well as a recipe in NuShell, for that reason it would be a good idea to give a quick overview on NuShell 
+
+---
 
 ## Nushell
 
@@ -155,6 +170,13 @@ Finally, in [example 10-just-a-ci](./examples/10-just-a-ci) we use NuShell's abi
 4. Poll the remote repository on a fixed interval for commit hash changes.  
 5. Execute the build command in different recipe.  
 6. Record the new commit hash in the controller recipe and resume polling.  
+---
 
+## Conclusion
 
+Make is on most systems, use it if you are producing files or directories, or if you can handle it's quirks as a command runner.
+Bash is available on most systems as well, use it if you can handle installing jq and curl.
+
+Just is easy to get and install, it is single cross-platform staticly linked binary that is available in many Operating System's package managers, and is easily installed and upgraded.
+NuShell is also easy to get and install, is also a cross-platform staticly linked binary is increasingly available in many OS package managers
 
