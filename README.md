@@ -17,7 +17,7 @@ The [examples](./examples) require the following software versions to fully func
 
 
 ## Caveats
-I made no effort to make this work on Windows, but with the correct tweaks, it should esepecially on WSL
+I made no effort to make this work on Windows, but with the correct tweaks, it should, especially on WSL.
 
 
 ## Software URLS  
